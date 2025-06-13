@@ -30,8 +30,13 @@ def index():
     return "<html>This is meant to just be a purely backend webhook API. For a list of endpoints, <a href='/endpoints'>click here</a>.</html>"
 
 @app.route('/endpoints')
-def endpoints():
-    return "TODO: Programmatically list endpoints."
+def list_routes():
+    output = []
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
+        route_info = f"{rule.rule} [{methods}] → {rule.endpoint}"
+        output.append(route_info)
+    return "<pre>" + "\n".join(sorted(output)) + "</pre>"
 
 
 
