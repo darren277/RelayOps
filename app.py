@@ -29,7 +29,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "<html>This is meant to just be a purely backend webhook API. For a list of endpoints, <a href='/endpoints'>click here</a>.</html>"
+    return render_template("index.html")
 
 @app.route('/endpoints')
 def list_routes():
@@ -40,6 +40,14 @@ def list_routes():
         output.append(route_info)
     return "<pre>" + "\n".join(sorted(output)) + "</pre>"
 
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
 
 
 endpoint_case_switch = {
