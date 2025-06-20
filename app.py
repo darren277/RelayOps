@@ -299,10 +299,19 @@ def op_grid():
     return render_template('op_grid.html')
 
 
+from dashboard import register_dash_app
+
+@app.route('/dashboard')
+def render_dashboard():
+    return redirect('/dash')
+
+
+dash_app = register_dash_app(app)
+
+#application = DispatcherMiddleware(app, {'/dash': dash_app.server})
+
+application = dash_app
 
 if __name__ == '__main__':
-    app.run(port=PORT)
-
-
-
-
+    #run_simple('0.0.0.0', PORT, application, use_reloader=True, use_debugger=True)
+    application.run('0.0.0.0', PORT, debug=True)
