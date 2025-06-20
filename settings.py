@@ -25,14 +25,14 @@ OPENPROJECT_URL = os.environ.get("OPENPROJECT_URL")
 
 LLM_API_KEY = os.environ.get("LLM_API_KEY")
 
-SURREALDB_NS = "gptstuff"
-SURREALDB_DB = "op"
+SURREALDB_NS = os.environ.get("SURREALDB_NS", "relayops")
+SURREALDB_DB = os.environ.get("SURREALDB_DB", "data")
 
-SURREALDB_USER = "root"
-SURREALDB_PASS = "root"
+SURREALDB_USER = os.environ.get("SURREALDB_USER", "root")
+SURREALDB_PASS = os.environ.get("SURREALDB_PASS", "root")
 
-SURREALDB_HOST = "localhost"
-SURREALDB_PORT = 8011
+SURREALDB_HOST = os.environ.get("SURREALDB_HOST", "localhost")
+SURREALDB_PORT = os.environ.get("SURREALDB_PORT", 8011)
 
 OP_PORT = 8130
 
