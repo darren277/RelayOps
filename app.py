@@ -1,9 +1,11 @@
+from sympy import use
+from werkzeug import run_simple
 from settings import MALFORMED_REQUEST, NO_SUCH_ENDPOINT, SUCCESS, SLACK_UNREACHABLE, PORT
 from settings import GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN
 from settings import OPENPROJECT_URL, OPENPROJECT_API_KEY
 from settings import LLM_API_KEY
 from webhooks.webhooks import openIssueWebhook, closeIssueWebhook, reopenIssueWebhook, create_sendgrid_issue_webhook
-
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from tasks import process_llm
 
 import json
@@ -20,7 +22,7 @@ op = OpenProject(url=OPENPROJECT_URL, api_key=OPENPROJECT_API_KEY)
 
 import requests
 
-from flask import Flask, request, make_response, jsonify, g, render_template
+from flask import Flask, redirect, request, make_response, jsonify, g, render_template
 
 app = Flask(__name__)
 
