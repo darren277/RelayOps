@@ -20,12 +20,34 @@ spec:
           image: "{{ .Values.flask.image.repository }}:{{ .Values.flask.image.tag }}"
           imagePullPolicy: "{{ .Values.flask.image.pullPolicy }}"
           env:
-            - name: DATABASE_URL
-              value: http://surrealdb:8000
-            - name: DB_USER
+            - name: PORT
+              value: "5000"
+            - name: SURREALDB_HOST
+              value: {{ .Values.surrealdb.host | quote }}
+            - name: SURREALDB_PORT
+              value: {{ .Values.surrealdb.port | quote }}
+            - name: SURREALDB_NS
+              value: {{ .Values.surrealdb.namespace | quote }}
+            - name: SURREALDB_DB
+              value: {{ .Values.surrealdb.database | quote }}
+            - name: SURREALDB_USER
               valueFrom: { secretKeyRef: { name: surreal-secret, key: user } }
-            - name: DB_PASS
+            - name: SURREALDB_PASS
               valueFrom: { secretKeyRef: { name: surreal-secret, key: pass } }
+            - name: GITHUB_REPO
+              value: {{ .Values.github.repo | quote }}
+            - name: GITHUB_REPO_OWNER
+              value: {{ .Values.github.repoOwner | quote }}
+            - name: GITHUB_REPO_NAME
+              value: {{ .Values.github.repoName | quote }}
+            - name: GITHUB_TOKEN
+              valueFrom: { secretKeyRef: { name: github-secret, key: apiKey } }
+            - name: LLM_API_KEY
+              valueFrom: { secretKeyRef: { name: openai-secret, key: apiKey } }
+            - name: SLACK_API_KEY
+              valueFrom: { secretKeyRef: { name: slack-secret, key: apiKey } }
+            - name: SLACK_RELAY_ENDPOINT
+              value: {{ .Values.slack.relayEndpoint | quote }}
           ports: [ { containerPort: 5000 } ]
 ---
 apiVersion: v1
