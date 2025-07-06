@@ -1,9 +1,11 @@
+from sympy import use
+from werkzeug import run_simple
 from settings import MALFORMED_REQUEST, NO_SUCH_ENDPOINT, SUCCESS, SLACK_UNREACHABLE, PORT
 from settings import GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_TOKEN
 from settings import OPENPROJECT_URL, OPENPROJECT_API_KEY
 from settings import LLM_API_KEY
 from webhooks.webhooks import openIssueWebhook, closeIssueWebhook, reopenIssueWebhook, create_sendgrid_issue_webhook
-
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from tasks import process_llm
 
 import json
@@ -20,19 +22,32 @@ op = OpenProject(url=OPENPROJECT_URL, api_key=OPENPROJECT_API_KEY)
 
 import requests
 
-from flask import Flask, request, make_response, jsonify, g, render_template
+from flask import Flask, redirect, request, make_response, jsonify, g, render_template
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    return "<html>This is meant to just be a purely backend webhook API. For a list of endpoints, <a href='/endpoints'>click here</a>.</html>"
+    return render_template("index.html")
 
 @app.route('/endpoints')
-def endpoints():
-    return "TODO: Programmatically list endpoints."
+def list_routes():
+    output = []
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
+        route_info = f"{rule.rule} [{methods}] → {rule.endpoint}"
+        output.append(route_info)
+    return "<pre>" + "\n".join(sorted(output)) + "</pre>"
 
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
 
 
 endpoint_case_switch = {
@@ -284,10 +299,19 @@ def op_grid():
     return render_template('op_grid.html')
 
 
+from dashboard import register_dash_app
+
+@app.route('/dashboard')
+def render_dashboard():
+    return redirect('/dash')
+
+
+dash_app = register_dash_app(app)
+
+#application = DispatcherMiddleware(app, {'/dash': dash_app.server})
+
+application = dash_app
 
 if __name__ == '__main__':
-    app.run(port=PORT)
-
-
-
-
+    #run_simple('0.0.0.0', PORT, application, use_reloader=True, use_debugger=True)
+    application.run('0.0.0.0', PORT, debug=True)

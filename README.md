@@ -8,6 +8,10 @@ This is a work in progress.
 
 **Please note:** LLM tool calls are very experimental at the moment.
 
+## MCP
+
+Check out the very early draft of the **Model Context Protocol (MCP)** that I am using to define the envelope for all messages exchanged through this relay station: [docs/MCP.md](docs/MCP.md).
+
 # Usage
 
 1. Configure webhook for a GitHub repository (see Notes below).
