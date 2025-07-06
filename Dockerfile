@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY ./llm ./llm
 COPY ./migrations ./migrations
+COPY ./webhooks ./webhooks
 #COPY ./tests ./tests
 COPY ./op_migrations.py .
 COPY ./surrealdb_migrations.py .
