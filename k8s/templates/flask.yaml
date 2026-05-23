@@ -11,7 +11,7 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
-        prometheus.io/port: "5000"
+        prometheus.io/port: "{{ .Values.flask.port }}"
     spec:
       imagePullSecrets:
         - name: ecr-secret
@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: "{{ .Values.flask.image.pullPolicy }}"
           env:
             - name: PORT
-              value: "5000"
+              value: "{{ .Values.flask.port }}"
             - name: SURREALDB_HOST
               value: {{ .Values.surrealdb.host | quote }}
             - name: SURREALDB_PORT
@@ -48,11 +48,11 @@ spec:
               valueFrom: { secretKeyRef: { name: slack-secret, key: apiKey } }
             - name: SLACK_RELAY_ENDPOINT
               value: {{ .Values.slack.relayEndpoint | quote }}
-          ports: [ { containerPort: 5000 } ]
+          ports: [ { containerPort: {{ .Values.flask.port }} } ]
 ---
 apiVersion: v1
 kind: Service
 metadata: { name: flask-app, namespace: {{ .Values.namespace }} }
 spec:
   selector: { app: flask-app }
-  ports: [ { port: 80, targetPort: 5000 } ]
+  ports: [ { port: 80, targetPort: {{ .Values.flask.port }} } ]
