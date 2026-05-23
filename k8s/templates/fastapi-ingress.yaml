@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: fastapi-ingress, namespace: {{ .Values.namespace }} }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: fastapi-ingress } }
+  template:
+    metadata:
+      labels:
+        app: fastapi-ingress
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "{{ .Values.fastapi_ingress.port }}"
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+      containers:
+        - name: fastapi-ingress
+          image: "{{ .Values.fastapi_ingress.image.repository }}:{{ .Values.fastapi_ingress.image.tag }}"
+          imagePullPolicy: "{{ .Values.fastapi_ingress.image.pullPolicy }}"
+          env:
+            - name: PORT
+              value: "{{ .Values.fastapi_ingress.port }}"
+            - name: SURREALDB_HOST
+              value: {{ .Values.surrealdb.host | quote }}
+            - name: SURREALDB_PORT
+              value: {{ .Values.surrealdb.port | quote }}
+            - name: SURREALDB_NS
+              value: {{ .Values.surrealdb.namespace | quote }}
+            - name: SURREALDB_DB
+              value: {{ .Values.surrealdb.database | quote }}
+            - name: SURREALDB_USER
+              valueFrom: { secretKeyRef: { name: surreal-secret, key: user } }
+            - name: SURREALDB_PASS
+              valueFrom: { secretKeyRef: { name: surreal-secret, key: pass } }
+            - name: GITHUB_REPO
+              value: {{ .Values.github.repo | quote }}
+            - name: GITHUB_REPO_OWNER
+              value: {{ .Values.github.repoOwner | quote }}
+            - name: GITHUB_REPO_NAME
+              value: {{ .Values.github.repoName | quote }}
+            - name: GITHUB_TOKEN
+              valueFrom: { secretKeyRef: { name: github-secret, key: apiKey } }
+            - name: LLM_API_KEY
+              valueFrom: { secretKeyRef: { name: openai-secret, key: apiKey } }
+            - name: SLACK_API_KEY
+              valueFrom: { secretKeyRef: { name: slack-secret, key: apiKey } }
+            - name: SLACK_RELAY_ENDPOINT
+              value: {{ .Values.slack.relayEndpoint | quote }}
+          ports: [ { containerPort: {{ .Values.fastapi_ingress.port }} } ]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: fastapi-ingress, namespace: {{ .Values.namespace }} }
+spec:
+  selector: { app: fastapi-ingress }
+  ports: [ { port: 80, targetPort: {{ .Values.fastapi_ingress.port }} } ]
