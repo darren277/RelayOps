@@ -1,3 +1,4 @@
+""""""
 from sympy import use
 from werkzeug import run_simple
 from settings import MALFORMED_REQUEST, NO_SUCH_ENDPOINT, SUCCESS, SLACK_UNREACHABLE, PORT
@@ -84,7 +85,7 @@ sendgrid_endpoint_case_switch = {
 
 
 
-@app.route('/github', methods=['POST'])
+#@app.route('/github', methods=['POST'])
 def github_case_switch():
     result = NO_SUCH_ENDPOINT
     action = request.json.get('action')
@@ -135,7 +136,7 @@ def create_issue_on_github(title, body):
     else:
         return True
 
-@app.route("/slack/githubissue", methods=["POST"])
+#@app.route("/slack/githubissue", methods=["POST"])
 def slack_github_issue():
     user_text = request.form.get("text", "")
     user_id = request.form.get("user_id", "")
@@ -187,7 +188,7 @@ def create_new_task(title: str, project_name: str):
     return task
 
 
-@app.route("/openproject", methods=["POST"])
+#@app.route("/openproject", methods=["POST"])
 def open_project():
     json_data = request.json
 
@@ -205,7 +206,7 @@ def open_project():
 
     return jsonify({"response_type": "ephemeral", "text": f"Testing: {project_title}"}), 200
 
-@app.route("/slack/openproject", methods=["POST"])
+#@app.route("/slack/openproject", methods=["POST"])
 def slack_openproject():
     user_text = request.form.get("text", "")
     user_id = request.form.get("user_id", "")
@@ -219,7 +220,7 @@ def slack_openproject():
     return jsonify({"response_type": "ephemeral", "text": f"Your task {task_title} was created on OpenProject: {project_title}"}), 200
 
 
-@app.route("/slack/llm_create_task", methods=["POST"])
+#@app.route("/slack/llm_create_task", methods=["POST"])
 def slack_llm_create_task():
     user_text = request.form.get("text", "")
     user_id = request.form.get("user_id", "")
@@ -237,7 +238,7 @@ def slack_llm_create_task():
     }), 200
 
 
-@app.route('/slack/llm_wiki', methods=['POST'])
+#@app.route('/slack/llm_wiki', methods=['POST'])
 def slack_llm_wiki():
     user_text = request.form.get("text", "")
     user_id = request.form.get("user_id", "")
@@ -255,7 +256,7 @@ def slack_llm_wiki():
     }), 200
 
 
-@app.route('/sendgrid-events', methods=['POST'])
+#@app.route('/sendgrid-events', methods=['POST'])
 def sendgrid_event_listener():
     events = request.get_json()
     for event in events:
