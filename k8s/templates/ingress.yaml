@@ -20,3 +20,17 @@ spec:
               service:
                 name: flask-app
                 port: { number: 80 }
+          - path: /webhooks
+            pathType: Prefix
+            backend:
+              service:
+                name: mcp-ingress
+                port:
+                  number: 80
+          - path: /mcp
+            pathType: Prefix
+            backend:
+              service:
+                name: mcp-server
+                port:
+                  number: 9000
