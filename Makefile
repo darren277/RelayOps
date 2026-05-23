@@ -5,12 +5,25 @@ include .env
 auth:
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(DOCKER_REGISTRY)
 
-create-repo:
+create-repos:
 	aws ecr create-repository --repository-name $(FLASK_IMAGE) --region us-east-1 || true
+	aws ecr create-repository --repository-name $(MCP_SERVER_IMAGE) --region us-east-1 || true
+	aws ecr create-repository --repository-name $(FASTAPI_INGRESS_IMAGE) --region us-east-1 || true
 
 docker-flask:
 	docker build --build-arg PORT=$(FLASK_PORT) -t $(DOCKER_REGISTRY)/$(FLASK_IMAGE):$(FLASK_VERSION) -f Dockerfile .
 	docker push $(DOCKER_REGISTRY)/$(FLASK_IMAGE):$(FLASK_VERSION)
+	kubectl rollout restart deployment $(FLASK_DEPLOYMENT) --namespace=$(NAMESPACE)
+
+docker-mcp:
+	docker build --build-arg PORT=$(MCP_SERVER_PORT) -t $(DOCKER_REGISTRY)/$(MCP_SERVER_IMAGE):$(MCP_SERVER_VERSION) -f Dockerfile.mcp .
+	docker push $(DOCKER_REGISTRY)/$(MCP_SERVER_IMAGE):$(MCP_SERVER_VERSION)
+	kubectl rollout restart deployment $(MCP_SERVER_DEPLOYMENT) --namespace=$(NAMESPACE)
+
+docker-ingress:
+	docker build --build-arg PORT=$(FASTAPI_INGRESS_PORT) -t $(DOCKER_REGISTRY)/$(FASTAPI_INGRESS_IMAGE):$(FASTAPI_INGRESS_VERSION) -f Dockerfile.ingress .
+	docker push $(DOCKER_REGISTRY)/$(FASTAPI_INGRESS_IMAGE):$(FASTAPI_INGRESS_VERSION)
+	kubectl rollout restart deployment $(FASTAPI_INGRESS_DEPLOYMENT) --namespace=$(NAMESPACE)
 
 
 # Kubernetes and Helm
