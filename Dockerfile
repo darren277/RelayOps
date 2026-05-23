@@ -8,8 +8,21 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+#COPY requirements.txt .
+#RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install flask werkzeug
+RUN pip install gunicorn
+RUN pip install dotenv
+RUN pip install celery
+RUN pip install requests
+RUN pip install sympy
+RUN pip install dash
+RUN pip install pandas
+
+RUN pip install openai
+
+RUN pip install pyopenproject
 
 # Copy the application code
 COPY ./llm ./llm
@@ -27,6 +40,5 @@ COPY ./tasks.py .
 
 EXPOSE 5000
 
-RUN pip install gunicorn
 
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]

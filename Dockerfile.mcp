@@ -1,0 +1,41 @@
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+ENV PORT=9000
+
+WORKDIR /app
+
+RUN pip install --upgrade pip
+
+#COPY requirements.txt .
+#RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install requests
+RUN pip install pyopenproject
+
+COPY pyproject.toml .
+
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN pip install uv
+RUN uv pip install --no-cache-dir git+https://github.com/jlowin/fastmcp.git@main#egg=fastmcp --system
+RUN uv add fastmcp
+
+RUN echo "from fastmcp.server.middleware.timing import TimingMiddleware" >> test.py
+RUN python test.py
+
+# Copy the application code
+COPY ./mcp_init.py .
+COPY ./mcp_server.py .
+COPY ./tools ./tools
+COPY ./llm ./llm
+COPY ./webhooks ./webhooks
+#COPY ./tests ./tests
+COPY ./settings.py .
+#COPY ./logger.py .
+
+
+EXPOSE 9000
+
+
+#CMD ["uvicorn", "mcp_server:mcp", "--host", "0.0.0.0", "--port", "9000"]
+CMD ["python", "mcp_server.py"]

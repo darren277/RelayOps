@@ -1,0 +1,29 @@
+FROM python:3.12-slim
+
+ENV FLASK_APP=ingress.py
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+
+WORKDIR /app
+
+RUN pip install --upgrade pip
+
+#COPY requirements.txt .
+#RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install fastmcp
+RUN pip install fastapi
+
+# Copy the application code
+COPY ./ingress.py .
+#COPY ./tests ./tests
+COPY ./settings.py .
+#COPY ./logger.py .
+
+
+EXPOSE 8080
+
+RUN pip install gunicorn
+RUN pip install uvicorn
+
+CMD ["uvicorn", "ingress:app", "--host", "0.0.0.0", "--port", "8080"]
